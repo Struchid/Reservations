@@ -7,19 +7,17 @@ Some unit tests are added too.
 
 
 -------------------------------------------------------------
-Current issue:
-Trying to run unit tests while using PSQL raises a duplicate key exception - not quite sure why it tries to use the same ID twice. Same tests work like a charm on sqlite DBMS instead
+Current issue:<br>
+Trying to run unit tests while using PostgreSQL raises a duplicate key exception - not quite sure why it tries to use the same ID twice. Same tests work like a charm on sqlite DBMS instead
 Current workaround - using sqlite for running tests instead. 
 Still looking for a way to solve this issue.
 
-Exception:
-"""
-django.db.utils.IntegrityError: duplicate key value violates unique constraint "meeting_room_pkey"
+Exception:<br>
+django.db.utils.IntegrityError: duplicate key value violates unique constraint "meeting_room_pkey"<br>
 DETAIL:  Key (id)=(1) already exists.
-"""
 
-Related resources:
-https://code.djangoproject.com/ticket/17415
-https://code.djangoproject.com/ticket/16353#no1
-https://devdreamz.com/question/630030-django-db-utils-integrityerror-duplicate-key-value-violates-unique-constraint
-https://searene.github.io/2016/01/10/django-db-utils-IntegrityError-duplicate-key-value-violates-unique-constraint/
+Related resources:<br>
+https://code.djangoproject.com/ticket/17415<br>
+https://code.djangoproject.com/ticket/16353#no1<br>
+https://devdreamz.com/question/630030-django-db-utils-integrityerror-duplicate-key-value-violates-unique-constraint<br>
+https://searene.github.io/2016/01/10/django-db-utils-IntegrityError-duplicate-key-value-violates-unique-constraint/<br>
