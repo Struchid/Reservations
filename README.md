@@ -1,9 +1,10 @@
 # DjangoAPI
 Trying out Django framework and its REST API
 
-The repo consists of a simple POST/GET/DELETE request functionality using Python3, Django + Django REST framework, PostgreSQL DBMS. 
-Fixtures are used to load test data while migrating. 
-Some unit tests are added too.
+The repo consists of a simple POST/GET/DELETE request functionality using Python3, Django + Django REST framework, PostgreSQL DBMS.<br>
+Fixtures are used to load test data while migrating.<br>
+Flake8 used to ensure PEP8 guidelines are followed correctly.<br>
+Some unit tests were added to test the API requests as well.<br>
 
 
 -------------------------------------------------------------
