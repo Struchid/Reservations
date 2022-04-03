@@ -10,7 +10,7 @@ from .models import MeetingRoom
 class MeetingRoomViews(APIView):
     def post(self, request):
         serializer = MeetingRoomSerializer(data=request.data)
-        if serializer.is_valid():
+        if serializer.is_valid() and not int(request.data.get('capacity')) == 0:
             serializer.save()
             return Response({'status': 'success', 'data': serializer.data, }, status=status.HTTP_200_OK)
         else:
@@ -18,7 +18,13 @@ class MeetingRoomViews(APIView):
 
     def get(self, request, id=None):
         if id:
-            room = MeetingRoom.objects.get(id=id)
+            try:
+                room = MeetingRoom.objects.get(id=id)
+            except MeetingRoom.DoesNotExist as e:
+                return Response(
+                    {'status': 'error', 'data': f'Meeting room with id {id} not found'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
             serializer = MeetingRoomSerializer(room)
             return Response({'status': 'success', 'data': serializer.data}, status=status.HTTP_200_OK)
 
