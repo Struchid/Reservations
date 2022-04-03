@@ -7,11 +7,14 @@ from django.core import serializers
 
 def load_fixture(apps, schema_editor):
     fixture_location = os.path.join(
-        os.path.abspath(os.path.join(os.path.dirname(__file__), '../fixtures')),
+        os.path.abspath(os.path.join(os.path.dirname(__file__),
+                                     '../fixtures')),
         'meeting_room.json'
     )
     with open(fixture_location, 'rb') as fixture:
-        objects = serializers.deserialize('json', fixture, ignorenoneexistent=True)
+        objects = serializers.deserialize(
+            'json', fixture, ignorenoneexistent=True
+        )
         for obj in objects:
             obj.save()
 

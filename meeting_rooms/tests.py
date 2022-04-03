@@ -1,10 +1,8 @@
-
 from django.db import IntegrityError
 from rest_framework import status
 from rest_framework.test import APITestCase
 
 import json
-from .serializers import MeetingRoomSerializer
 from .models import MeetingRoom
 
 
@@ -50,28 +48,35 @@ class TestRequestPost(APITestCase):
     def test_01_post_payload_without_custom_name(self):
         # Test valid POST request -- not required field not provided
         response = self.client.post(
-            ENDPOINT, json.dumps(self.payload_without_custom_name), content_type=CONTENT_TYPE
+            ENDPOINT, json.dumps(self.payload_without_custom_name),
+            content_type=CONTENT_TYPE
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_02_post_payload_without_room_number(self):
         # Test invalid POST request -- required field not provided
         response = self.client.post(
-            ENDPOINT, json.dumps(self.payload_without_required_field), content_type=CONTENT_TYPE
+            ENDPOINT, json.dumps(self.payload_without_required_field),
+            content_type=CONTENT_TYPE
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_03_post_payload_zero_quantity(self):
-        # Test invalid POST request -- capacity field zero (which makes no sense for room capacity)
+        # Test invalid POST request -- capacity field zero
+        # (which makes no sense for room capacity)
         response = self.client.post(
-            ENDPOINT, json.dumps(self.payload_capacity_zero), content_type=CONTENT_TYPE
+            ENDPOINT, json.dumps(self.payload_capacity_zero),
+            content_type=CONTENT_TYPE
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_04_post_payload_negative_capacity(self):
         # Test invalid POST request -- negative capacity provided
         with self.assertRaises(IntegrityError):
-            self.client.post(ENDPOINT, json.dumps(self.payload_capacity_negative), content_type=CONTENT_TYPE)
+            self.client.post(
+                ENDPOINT, json.dumps(self.payload_capacity_negative),
+                content_type=CONTENT_TYPE
+            )
 
 
 class TestRequestGet(APITestCase):

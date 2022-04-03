@@ -7,7 +7,10 @@ class MeetingRoom(models.Model):
     capacity = models.PositiveIntegerField()
 
     def __str__(self):
-        name = f'{self.room_number} - {self.custom_name}' if self.custom_name else f'{self.room_number}'
+        if self.custom_name:
+            name = f'{self.room_number} - {self.custom_name}'
+        else:
+            name = f'{self.room_number}'
         return name
 
     class Meta:
