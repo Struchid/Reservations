@@ -1,7 +1,11 @@
-from django.urls import path
-from .views import MeetingRoomViews
+from django.urls import path, include
+from rest_framework import routers
+from .views import MeetingRoomViewSet
+
+
+router = routers.DefaultRouter()
+router.register('meeting_rooms', MeetingRoomViewSet)
 
 urlpatterns = [
-    path('meeting_rooms/', MeetingRoomViews.as_view()),
-    path('meeting_rooms/<int:id>', MeetingRoomViews.as_view())
+    path('', include(router.urls))
 ]
