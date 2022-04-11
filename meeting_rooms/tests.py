@@ -1,6 +1,5 @@
 import json
 
-from django.core import exceptions
 from django.db import IntegrityError
 from rest_framework import status
 from rest_framework.test import APITestCase
@@ -45,13 +44,15 @@ class TestRequestPost(APITestCase):
         response = self.client.post(
             ENDPOINT, json.dumps(self.payload_valid), content_type=CONTENT_TYPE
         )
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED,
-                         'Valid payload POST was not successful')
+        self.assertEqual(
+            response.status_code, status.HTTP_201_CREATED, response.json()
+        )
 
         # Test if the record was created
-        meeting_room = MeetingRoom.objects.get(**self.payload_valid)
+        latest_meeting_room_number = MeetingRoom.objects.latest(
+            'id').room_number
         self.assertEqual(
-            bool(meeting_room), True, 'Meeting room was not created with POST'
+            latest_meeting_room_number, self.payload_valid.get('room_number')
         )
 
     def test_01_post_payload_without_custom_name(self):
@@ -60,7 +61,11 @@ class TestRequestPost(APITestCase):
             ENDPOINT, json.dumps(self.payload_without_custom_name),
             content_type=CONTENT_TYPE
         )
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(
+            response.status_code, status.HTTP_201_CREATED, response.json()
+        )
+        # Check if the new entry has no custom name
+        self.assertIsNone(MeetingRoom.objects.latest('id').custom_name)
 
     def test_02_post_payload_without_room_number(self):
         # Test invalid POST request -- required field not provided
@@ -68,7 +73,9 @@ class TestRequestPost(APITestCase):
             ENDPOINT, json.dumps(self.payload_without_required_field),
             content_type=CONTENT_TYPE
         )
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(
+            response.status_code, status.HTTP_400_BAD_REQUEST, response.json()
+        )
 
     def test_03_post_payload_zero_quantity(self):
         # Test invalid POST request -- capacity field zero
@@ -77,7 +84,9 @@ class TestRequestPost(APITestCase):
             ENDPOINT, json.dumps(self.payload_capacity_zero),
             content_type=CONTENT_TYPE
         )
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(
+            response.status_code, status.HTTP_400_BAD_REQUEST, response.json()
+        )
 
     def test_04_post_payload_negative_capacity(self):
         # Test invalid POST request -- negative capacity provided
@@ -89,27 +98,32 @@ class TestRequestPost(APITestCase):
 
 
 class TestRequestGet(APITestCase):
-    @classmethod
-    def setUpClass(cls):
-        cls.cls_atomics = cls._enter_atomics()
-        MeetingRoom.objects.create(room_number='1', capacity=30)
+    def setUp(self):
+        self.meeting_room = MeetingRoom.objects.create(
+            room_number='1', capacity=30
+        )
 
     def test_05_request_get_all_meeting_rooms(self):
         # Test valid GET request -- all meeting rooms
         response = self.client.get(ENDPOINT)
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(
+            response.status_code, status.HTTP_200_OK, response.json()
+        )
 
     def test_06_request_get_single_meeting_room(self):
         # Test valid GET request -- single meeting room
-        id = MeetingRoom.objects.get(room_number='1').id
-        response = self.client.get(ENDPOINT + f'{id}/')
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        response = self.client.get(ENDPOINT + f'{self.meeting_room.id}/')
+        self.assertEqual(
+            response.status_code, status.HTTP_200_OK, response.json()
+        )
 
     def test_07_request_get_single_meeting_room_invalid_id(self):
         # Test valid GET request -- object does not exist
         id = str(MeetingRoom.objects.latest('id').id + 1)
         response = self.client.get(ENDPOINT + f'{id}/')
-        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertEqual(
+            response.status_code, status.HTTP_404_NOT_FOUND, response.json()
+        )
 
 
 class TestRequestDelete(APITestCase):
@@ -119,16 +133,16 @@ class TestRequestDelete(APITestCase):
     def test_08_request_delete_record_valid(self):
         # Test valid DELETE request
         response = self.client.delete(ENDPOINT+'1/')
-        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEqual(
+            response.status_code, status.HTTP_204_NO_CONTENT
+        )
         # Will fail if object is found -- not deleted
-        try:
-            MeetingRoom.objects.get(id=1)
-            self.fail('Record was not deleted')
-        except exceptions.ObjectDoesNotExist:
-            self.assertEqual(1, 1)
+        self.assertFalse(MeetingRoom.objects.filter(id=1).exists())
 
     def test_09_request_delete_record_invalid(self):
         # Test invalid DELETE request
         invalid_id = str(MeetingRoom.objects.latest('id').id + 1) + '/'
         response = self.client.delete(ENDPOINT+invalid_id)
-        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertEqual(
+            response.status_code, status.HTTP_404_NOT_FOUND, response.json()
+        )
