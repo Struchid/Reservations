@@ -1,5 +1,4 @@
-from rest_framework.response import Response
-from rest_framework import status, viewsets
+from rest_framework import viewsets
 
 from .serializers import MeetingRoomSerializer
 from .models import MeetingRoom
