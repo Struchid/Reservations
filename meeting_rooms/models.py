@@ -1,3 +1,4 @@
+from django.contrib.auth.models import User
 from django.db import models
 
 
@@ -15,3 +16,13 @@ class MeetingRoom(models.Model):
 
     class Meta:
         db_table = 'meeting_room'
+
+
+class Reservation(models.Model):
+    meeting_room = models.ForeignKey(MeetingRoom, on_delete=models.CASCADE)
+    time_from = models.TimeField()
+    time_to = models.TimeField()
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    class Meta:
+        db_table = 'reservation'
