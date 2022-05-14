@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import MeetingRoom
+from .models import MeetingRoom, Reservation
 
 
 class MeetingRoomSerializer(serializers.ModelSerializer):
@@ -17,3 +17,9 @@ class MeetingRoomSerializer(serializers.ModelSerializer):
             message = 'Capacity of the room must be a positive integer'
             raise serializers.ValidationError(message)
         return data
+
+
+class ReservationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Reservation
+        fields = '__all__'

@@ -1,5 +1,5 @@
-from django.contrib.auth.models import User
 from django.db import models
+from django.utils import timezone
 
 
 class MeetingRoom(models.Model):
@@ -18,10 +18,17 @@ class MeetingRoom(models.Model):
         db_table = 'meeting_room'
 
 
+class User(models.Model):
+    username = models.CharField(max_length=100)
+
+    class Meta:
+        db_table = 'user'
+
+
 class Reservation(models.Model):
     meeting_room = models.ForeignKey(MeetingRoom, on_delete=models.CASCADE)
-    time_from = models.TimeField()
-    time_to = models.TimeField()
+    time_from = models.DateTimeField(default=timezone.now)
+    time_to = models.DateTimeField(default=timezone.now)
     created_by = models.ForeignKey(User, on_delete=models.CASCADE)
 
     class Meta:
