@@ -112,6 +112,7 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+AUTH_USER_MODEL = "meeting_rooms.user"
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.0/topics/i18n/

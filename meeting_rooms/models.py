@@ -1,8 +1,25 @@
+from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.utils import timezone
 
 
-class MeetingRoom(models.Model):
+class BaseAbstractClass(models.Model):
+    description = models.TextField(max_length=400, null=True, blank=True)
+    creation_date = models.DateTimeField(default=timezone.now, null=True)
+
+    class Meta:
+        abstract = True
+
+
+class User(AbstractUser):
+    def __str__(self):
+        return self.username
+
+    class Meta:
+        db_table = 'user'
+
+
+class MeetingRoom(BaseAbstractClass):
     room_number = models.CharField(max_length=16, unique=True)
     custom_name = models.CharField(max_length=32, null=True, blank=True)
     capacity = models.PositiveIntegerField()
@@ -18,18 +35,22 @@ class MeetingRoom(models.Model):
         db_table = 'meeting_room'
 
 
-class User(models.Model):
-    username = models.CharField(max_length=100)
+class Reservation(BaseAbstractClass):
+    @staticmethod
+    def get_default_reservation_end_time() -> timezone:
+        return timezone.now() + timezone.timedelta(hours=1)
 
-    class Meta:
-        db_table = 'user'
-
-
-class Reservation(models.Model):
-    meeting_room = models.ForeignKey(MeetingRoom, on_delete=models.CASCADE)
+    meeting_room = models.ForeignKey(
+        MeetingRoom, related_name='reservation', on_delete=models.CASCADE
+    )
     time_from = models.DateTimeField(default=timezone.now)
-    time_to = models.DateTimeField(default=timezone.now)
-    created_by = models.ForeignKey(User, on_delete=models.CASCADE)
+    time_to = models.DateTimeField(default=get_default_reservation_end_time())
+    organizer = models.ForeignKey(
+        User, related_name='organizer', on_delete=models.CASCADE, null=True
+    )
+    participants = models.ManyToManyField(
+        User, related_name='reservation_participant'
+    )
 
     class Meta:
         db_table = 'reservation'
