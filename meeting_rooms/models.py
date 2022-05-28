@@ -35,16 +35,16 @@ class MeetingRoom(BaseAbstractClass):
         db_table = 'meeting_room'
 
 
-class Reservation(BaseAbstractClass):
-    @staticmethod
-    def get_default_reservation_end_time() -> timezone:
-        return timezone.now() + timezone.timedelta(hours=1)
+def get_default_reservation_end_time() -> timezone:
+    return timezone.now() + timezone.timedelta(hours=1)
 
+
+class Reservation(BaseAbstractClass):
     meeting_room = models.ForeignKey(
         MeetingRoom, related_name='reservation', on_delete=models.CASCADE
     )
     time_from = models.DateTimeField(default=timezone.now)
-    time_to = models.DateTimeField(default=get_default_reservation_end_time())
+    time_to = models.DateTimeField(default=get_default_reservation_end_time)
     organizer = models.ForeignKey(
         User, related_name='organizer', on_delete=models.CASCADE, null=True
     )
