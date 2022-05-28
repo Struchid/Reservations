@@ -10,6 +10,7 @@ flake8 = "*"
 requests = "*"
 psycopg2 = "*"
 drf-yasg = "*"
+model-bakery = "*"
 
 [dev-packages]
 
