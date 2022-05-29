@@ -46,7 +46,7 @@ class Reservation(BaseAbstractClass):
     time_from = models.DateTimeField(default=timezone.now)
     time_to = models.DateTimeField(default=get_default_reservation_end_time)
     organizer = models.ForeignKey(
-        User, related_name='organizer', on_delete=models.CASCADE, null=True
+        User, related_name='organizer', on_delete=models.CASCADE
     )
     participants = models.ManyToManyField(
         User, related_name='reservation_participant'
