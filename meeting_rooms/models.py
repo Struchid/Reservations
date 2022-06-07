@@ -40,17 +40,11 @@ def get_default_reservation_end_time() -> timezone:
 
 
 class Reservation(BaseAbstractClass):
-    meeting_room = models.ForeignKey(
-        MeetingRoom, related_name='reservation', on_delete=models.CASCADE
-    )
+    meeting_room = models.ForeignKey(MeetingRoom, related_name='reservations', on_delete=models.CASCADE)
     time_from = models.DateTimeField(default=timezone.now)
     time_to = models.DateTimeField(default=get_default_reservation_end_time)
-    organizer = models.ForeignKey(
-        User, related_name='organizer', on_delete=models.CASCADE
-    )
-    participants = models.ManyToManyField(
-        User, related_name='reservation_participant'
-    )
+    organizer = models.ForeignKey(User, related_name='organizer', on_delete=models.CASCADE)
+    participants = models.ManyToManyField(User, related_name='participations')
 
     class Meta:
         db_table = 'reservation'

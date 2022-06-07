@@ -12,14 +12,13 @@ class UserAdmin(admin.ModelAdmin):
         """Deletes organized reservations and removes user from attended ones"""
         user = queryset.first()
         user_id = user.id
-        organized_reservations = Reservation.objects.select_related(
-            'organizer').filter(organizer__id=user_id)
+        organized_reservations = Reservation.objects.select_related('organizer').filter(organizer__id=user_id)
         organized_reservations.delete()
-        participated_in_reservations = Reservation.objects.prefetch_related(
-            'participants').filter(participants__id=user_id)
+        participated_in_reservations = Reservation.objects.prefetch_related('participants').filter(
+            participants__id=user_id)
         for reservation in participated_in_reservations:
-            reservation.participants.remove(queryset.first())
-            if not reservation.participants.all():
+            reservation.participants.remove(user)
+            if not reservation.participants.exists():
                 reservation.delete()
 
 
