@@ -15,7 +15,8 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='reservation',
             name='meeting_room',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='reservations', to='meeting_rooms.meetingroom'),
+            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='reservations',
+                                    to='meeting_rooms.meetingroom'),
         ),
         migrations.AlterField(
             model_name='reservation',

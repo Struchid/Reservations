@@ -1,4 +1,4 @@
-from rest_framework import serializers, status
+from rest_framework import serializers
 
 from .models import MeetingRoom, Reservation, User
 
@@ -16,8 +16,8 @@ class MeetingRoomSerializer(serializers.ModelSerializer):
 
     def validate(self, data):
         if data.get('capacity') <= 0:
-            message = 'Capacity of the room must be a positive integer'
-            return {'non_field_errors': [message], 'status_code': status.HTTP_400_BAD_REQUEST}
+            error = {'non_field_errors': ['Capacity of the room must be a positive integer']}
+            raise serializers.ValidationError(error)
         return data
 
 
@@ -36,6 +36,6 @@ class ReservationSerializer(serializers.ModelSerializer):
             time_to__gte=time_from,
         )
         if reservations:
-            message = 'Room is already booked for the requested period'
-            return {'non_field_errors': [message], 'status_code': status.HTTP_400_BAD_REQUEST}
+            error = {'non_field_errors': ['Room is already booked for the requested period']}
+            raise serializers.ValidationError(error)
         return data
