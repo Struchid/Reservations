@@ -13,6 +13,7 @@ class UserViewSet(viewsets.ModelViewSet):
     @action(methods=['GET'], detail=True, url_path='get_user_created_reservations', url_name='created-reservations')
     def get_user_created_reservations(self, request, pk=None):
         queryset = Reservation.objects.select_related('organizer').filter(organizer__id=pk)
+        # queryset = User.objects.get(id=pk).organizer.filter(organizer__id=pk)
         serializer = ReservationSerializer(queryset, many=True)
         return Response(serializer.data)
 
@@ -21,6 +22,7 @@ class UserViewSet(viewsets.ModelViewSet):
     )
     def get_user_attended_reservations(self, request, pk=None):
         queryset = Reservation.objects.prefetch_related('participants').filter(participants__id=pk)
+        # queryset = User.objects.get(id=pk).participations.filter(participants__id=pk)
         serializer = ReservationSerializer(queryset, many=True)
         return Response(serializer.data)
 

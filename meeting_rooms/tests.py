@@ -1,18 +1,13 @@
-from django.test import TestCase
+from datetime import timedelta
+
 from django.urls import reverse
 from model_bakery.baker import make
 from rest_framework import status
 
-import meeting_rooms.models
 from .models import MeetingRoom, User, Reservation
 from .serializers import MeetingRoomSerializer
-
-
-CONTENT_TYPE = 'application/json'
-
-
-class BaseTestCase(TestCase):
-    pass
+from meeting_rooms.utils.error_codes import Errors as errors
+from meeting_rooms.utils.tests_utils import BaseTestCase
 
 
 class MeetingRoomTestCase(BaseTestCase):
@@ -64,7 +59,7 @@ class MeetingRoomTestCase(BaseTestCase):
         response = self.client.post(reverse('meetingroom-list'), data=self.payload_capacity_zero, follow=True)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST, response.json())
         self.assertFalse(self.serializer.is_valid())
-        self.assertEqual(response.data['non_field_errors'][0], 'Capacity of the room must be a positive integer')
+        self.assertEqual(response.data['non_field_errors'][0], errors.CAPACITY_NOT_POSITIVE_INTEGER_ERROR)
 
     def test_post_payload_negative_capacity(self):
         response = self.client.post(reverse('meetingroom-list'), data=self.payload_capacity_negative, follow=True)
@@ -122,3 +117,33 @@ class UserTestCase(BaseTestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK, response.json())
         self.assertEqual(len(response.data), attended_reservations)
 
+
+class ReservationTestCase(BaseTestCase):
+    def setUp(self):
+        super().setUp()
+        self.meeting_room = make(MeetingRoom)
+        self.reservation = make(Reservation, meeting_room=self.meeting_room)
+        self.user = make(User)
+
+    def test_reservation_does_not_intertwine(self):
+        data = {
+            'meeting_room': self.meeting_room.id,
+            'time_from': self.reservation.time_from + timedelta(days=1),
+            'time_to': self.reservation.time_to + timedelta(days=1),
+            'organizer': self.user.id,
+            'participants': [self.user.id]
+        }
+        response = self.client.post(reverse('reservation-list'), data=data, follow=True)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+    def test_reservation_intertwines(self):
+        data = {
+            'meeting_room': self.meeting_room.id,
+            'time_from': self.reservation.time_from,
+            'time_to': self.reservation.time_to,
+            'organizer': self.user.id,
+            'participants': [self.user.id]
+        }
+        response = self.client.post(reverse('reservation-list'), data=data, follow=True)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.data['non_field_errors'][0], errors.ROOM_ALREADY_BOOKED_FOR_CHOSEN_PERIOD)
