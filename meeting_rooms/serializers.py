@@ -1,13 +1,13 @@
 from rest_framework import serializers
 
 from .models import MeetingRoom, Reservation, User
-from meeting_rooms.utils.error_codes import Errors as errors
+from meeting_rooms.utils.error_codes import ErrorCodes as error_codes
 
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = '__all__'
+        fields = ('username', 'first_name', 'last_name', 'email', 'is_staff')
 
 
 class MeetingRoomSerializer(serializers.ModelSerializer):
@@ -17,8 +17,7 @@ class MeetingRoomSerializer(serializers.ModelSerializer):
 
     def validate(self, data):
         if data.get('capacity') <= 0:
-            error = {'non_field_errors': [errors.CAPACITY_NOT_POSITIVE_INTEGER_ERROR]}
-            raise serializers.ValidationError(error)
+            raise serializers.ValidationError(error_codes.CAPACITY_NOT_POSITIVE_INTEGER_ERROR)
         return data
 
 
@@ -37,6 +36,5 @@ class ReservationSerializer(serializers.ModelSerializer):
             time_to__gte=time_from,
         )
         if reservations:
-            error = {'non_field_errors': [errors.ROOM_ALREADY_BOOKED_FOR_CHOSEN_PERIOD]}
-            raise serializers.ValidationError(error)
+            raise serializers.ValidationError(error_codes.ROOM_ALREADY_BOOKED_FOR_CHOSEN_PERIOD)
         return data
