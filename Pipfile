@@ -9,6 +9,9 @@ djangorestframework = "*"
 flake8 = "*"
 requests = "*"
 psycopg2 = "*"
+drf-yasg = "*"
+model-bakery = "*"
+pytest = "*"
 
 [dev-packages]
 
