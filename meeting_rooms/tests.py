@@ -44,7 +44,7 @@ class MeetingRoomTestCase(BaseTestCase):
         response = self.client.post(reverse('meetingroom-list'), data=self.payload_valid, follow=True)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED, response.json())
         latest_meeting_room_number = MeetingRoom.objects.latest('id').room_number
-        self.assertEqual(latest_meeting_room_number, self.payload_valid.get('room_number'))
+        self.assertEqual(latest_meeting_room_number, self.payload_valid['room_number'])
 
     def test_post_payload_without_custom_name(self):
         response = self.client.post(reverse('meetingroom-list'), data=self.payload_without_custom_name, follow=True)
